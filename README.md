@@ -3,7 +3,7 @@
 </h1>
 
 # About
-divire is a utility that automatically paints line art image files and converts them to layer formats. divire can run on Windows.
+divire is a utility that automatically paints line art image files and converts them to layered image formats. divire can run on Windows.
 
 <h1 align="center">
   <img src="https://user-images.githubusercontent.com/63274471/85966176-efd60f80-b9f9-11ea-941b-f8e83a546ce4.jpg" alt="divire_demo">
