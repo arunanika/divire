@@ -1,0 +1,1406 @@
+﻿<!--
+    divire
+
+    Copyright (C) 2020 Aru Nanika
+
+    This program is released under the MIT License.
+    https://opensource.org/licenses/MIT
+-->
+
+<Window x:Class="divire.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:divire.Views"
+        xmlns:vm="clr-namespace:divire.ViewModels"
+        xmlns:prtc="clr-namespace:divire.Protocols"
+        xmlns:ctrl="clr-namespace:divire.Controls"
+        xmlns:bhv="clr-namespace:divire.Behaviors"
+        mc:Ignorable="d"
+        InputMethod.IsInputMethodEnabled="False"
+        Title="divire"
+        Left="0"
+        Top="0"
+        Height="908"
+        Width="420"
+        bhv:AdjustWindowSizeBehavior.IsAttached="True"
+        bhv:AdjustWindowSizeBehavior.WindowTop="{Binding WindowTop, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+        bhv:AdjustWindowSizeBehavior.WindowLeft="{Binding WindowLeft, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+        bhv:AdjustWindowSizeBehavior.WindowHeight="{Binding WindowHeight, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+        bhv:AdjustWindowSizeBehavior.WindowWidth="{Binding WindowWidth, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+        bhv:AdjustWindowSizeBehavior.LastWindowTop="{Binding LastWindowTop, Mode=OneWayToSource}"
+        bhv:AdjustWindowSizeBehavior.LastWindowLeft="{Binding LastWindowLeft, Mode=OneWayToSource}"
+        bhv:AdjustWindowSizeBehavior.LastWindowHeight="{Binding LastWindowHeight, Mode=OneWayToSource}"
+        bhv:AdjustWindowSizeBehavior.LastWindowWidth="{Binding LastWindowWidth, Mode=OneWayToSource}"
+        AllowDrop="True"
+        bhv:FileDropEnabledBehavior.IsAttached="True"
+        bhv:FileDropEnabledBehavior.DroppedHeadItem="{Binding DroppedItem, Mode=OneWayToSource}"
+        MinWidth="300"
+        MinHeight="400"
+        WindowStyle="ToolWindow"
+        Style="{StaticResource MainWindowStyle}"
+        >
+
+    <Window.Resources>
+        <Style TargetType="Border">
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+
+        <Style TargetType="Button" BasedOn="{StaticResource ThemeButtonStyle}">
+        </Style>
+
+        <Style TargetType="TabItem" BasedOn="{StaticResource ThemeTabItemStyle}">
+        </Style>
+
+        <Style TargetType="CheckBox" BasedOn="{StaticResource ThemeCheckBoxStyle}">
+        </Style>
+
+        <Style TargetType="RadioButton" BasedOn="{StaticResource ThemeRadioButtonStyle}">
+        </Style>
+
+        <Style TargetType="ctrl:ColorSelector">
+            <Setter Property="Width" Value="82"/>
+            <Setter Property="Height" Value="36"/>
+        </Style>
+
+        <Style x:Key="TextBlockNormalStyle" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="{StaticResource divireGlyphs}"/>
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="Foreground" Value="{StaticResource ThemeGlyphRegularBrushKey}"/>
+        </Style>
+
+        <Style x:Key="TextBlockStyleInRegionsLayersArea" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="{StaticResource divireGlyphs}"/>
+            <Setter Property="FontSize" Value="18"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding HasLayersOfRegions}" Value="False">
+                    <Setter Property="Foreground" Value="{StaticResource ThemeGrayBrush00Key}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding HasLayersOfRegions}" Value="True">
+                    <Setter Property="Foreground" Value="{StaticResource ThemeGlyphRegularBrushKey}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="RectangleStyleInColorIndicator" TargetType="Rectangle">
+            <Setter Property="Margin" Value="0,0,1,0"/>
+            <Setter Property="Width" Value="{Binding Path=CellElementsWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ctrl:DisplayDataGrid}}"/>
+        </Style>
+
+        <Style x:Key="TextBlockIndicatorStyle" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="{StaticResource divireGlyphs}"/>
+            <Setter Property="Foreground" Value="{StaticResource IndicatorBrushKey}"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="FontSize" Value="200"/>
+            <Setter Property="Opacity" Value="0"/>
+        </Style>
+
+        <Style x:Key="TextBlockIndicatorStyle00" TargetType="TextBlock" BasedOn="{StaticResource TextBlockIndicatorStyle}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsBusy}" Value="True">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard Storyboard="{StaticResource Storyboard00}"/>
+                    </DataTrigger.EnterActions>
+                    <DataTrigger.ExitActions>
+                        <BeginStoryboard Storyboard="{StaticResource StoryboardExit}"/>
+                    </DataTrigger.ExitActions>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="TextBlockIndicatorStyle01" TargetType="TextBlock" BasedOn="{StaticResource TextBlockIndicatorStyle}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsBusy}" Value="True">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard Storyboard="{StaticResource Storyboard01}"/>
+                    </DataTrigger.EnterActions>
+                    <DataTrigger.ExitActions>
+                        <BeginStoryboard Storyboard="{StaticResource StoryboardExit}"/>
+                    </DataTrigger.ExitActions>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="TextBlockIndicatorStyle02" TargetType="TextBlock" BasedOn="{StaticResource TextBlockIndicatorStyle}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsBusy}" Value="True">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard Storyboard="{StaticResource Storyboard02}"/>
+                    </DataTrigger.EnterActions>
+                    <DataTrigger.ExitActions>
+                        <BeginStoryboard Storyboard="{StaticResource StoryboardExit}"/>
+                    </DataTrigger.ExitActions>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="TextBlockIndicatorStyle03" TargetType="TextBlock" BasedOn="{StaticResource TextBlockIndicatorStyle}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsBusy}" Value="True">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard Storyboard="{StaticResource Storyboard03}"/>
+                    </DataTrigger.EnterActions>
+                    <DataTrigger.ExitActions>
+                        <BeginStoryboard Storyboard="{StaticResource StoryboardExit}"/>
+                    </DataTrigger.ExitActions>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="TextBlockIndicatorStyle04" TargetType="TextBlock" BasedOn="{StaticResource TextBlockIndicatorStyle}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsBusy}" Value="True">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard Storyboard="{StaticResource Storyboard04}"/>
+                    </DataTrigger.EnterActions>
+                    <DataTrigger.ExitActions>
+                        <BeginStoryboard Storyboard="{StaticResource StoryboardExit}"/>
+                    </DataTrigger.ExitActions>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="TextBlockIndicatorStyle05" TargetType="TextBlock" BasedOn="{StaticResource TextBlockIndicatorStyle}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsBusy}" Value="True">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard Storyboard="{StaticResource Storyboard05}"/>
+                    </DataTrigger.EnterActions>
+                    <DataTrigger.ExitActions>
+                        <BeginStoryboard Storyboard="{StaticResource StoryboardExit}"/>
+                    </DataTrigger.ExitActions>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="TextBlockIndicatorStyle06" TargetType="TextBlock" BasedOn="{StaticResource TextBlockIndicatorStyle}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsBusy}" Value="True">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard Storyboard="{StaticResource Storyboard06}"/>
+                    </DataTrigger.EnterActions>
+                    <DataTrigger.ExitActions>
+                        <BeginStoryboard Storyboard="{StaticResource StoryboardExit}"/>
+                    </DataTrigger.ExitActions>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="TextBlockIndicatorStyle07" TargetType="TextBlock" BasedOn="{StaticResource TextBlockIndicatorStyle}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsBusy}" Value="True">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard Storyboard="{StaticResource Storyboard07}"/>
+                    </DataTrigger.EnterActions>
+                    <DataTrigger.ExitActions>
+                        <BeginStoryboard Storyboard="{StaticResource StoryboardExit}"/>
+                    </DataTrigger.ExitActions>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="TextBlockIndicatorStyle08" TargetType="TextBlock" BasedOn="{StaticResource TextBlockIndicatorStyle}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsBusy}" Value="True">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard Storyboard="{StaticResource Storyboard08}"/>
+                    </DataTrigger.EnterActions>
+                    <DataTrigger.ExitActions>
+                        <BeginStoryboard Storyboard="{StaticResource StoryboardExit}"/>
+                    </DataTrigger.ExitActions>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="TextBlockIndicatorStyle09" TargetType="TextBlock" BasedOn="{StaticResource TextBlockIndicatorStyle}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsBusy}" Value="True">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard Storyboard="{StaticResource Storyboard09}"/>
+                    </DataTrigger.EnterActions>
+                    <DataTrigger.ExitActions>
+                        <BeginStoryboard Storyboard="{StaticResource StoryboardExit}"/>
+                    </DataTrigger.ExitActions>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="TextBlockIndicatorStyle10" TargetType="TextBlock" BasedOn="{StaticResource TextBlockIndicatorStyle}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsBusy}" Value="True">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard Storyboard="{StaticResource Storyboard10}"/>
+                    </DataTrigger.EnterActions>
+                    <DataTrigger.ExitActions>
+                        <BeginStoryboard Storyboard="{StaticResource StoryboardExit}"/>
+                    </DataTrigger.ExitActions>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="TextBlockIndicatorStyle11" TargetType="TextBlock" BasedOn="{StaticResource TextBlockIndicatorStyle}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsBusy}" Value="True">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard Storyboard="{StaticResource Storyboard11}"/>
+                    </DataTrigger.EnterActions>
+                    <DataTrigger.ExitActions>
+                        <BeginStoryboard Storyboard="{StaticResource StoryboardExit}"/>
+                    </DataTrigger.ExitActions>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Window.DataContext>
+        <vm:MainWindowViewModel/>
+    </Window.DataContext>
+
+    <!--Grid of the overall structure-->
+    <Grid Margin="12,4,12,12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="52"/>
+            <RowDefinition Height="72"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="192"/>
+        </Grid.RowDefinitions>
+
+        <!--The header part of Window-->
+        <Grid  Grid.Row="0">
+            <Image Height="50"
+                   HorizontalAlignment="Left"
+                   Margin="2,2,0,0"
+                   Source="../Assets/divireTitleLogo.jpg"
+                   />
+            <Button HorizontalAlignment="Right"
+                    Margin="0,6,0,6"
+                    Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}"
+                    WindowChrome.IsHitTestVisibleInChrome="True"
+                    bhv:CloseButtonBehavior.IsAttached="True"
+                    >
+                <Button.Style>
+                    <Style TargetType="Button" BasedOn="{StaticResource ThemeButtonStyle}">
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="Red"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="{StaticResource PressedButtonBrushKey}"/>
+                                <Setter Property="Foreground" Value="{StaticResource ThemeGrayBrush03Key}"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+                <TextBlock Text="&#x00D7;"
+                           Margin="0,4,0,0"
+                           FontFamily="{StaticResource divireGlyphs}"
+                           FontSize="22"
+                           />
+            </Button>
+
+            <Button HorizontalAlignment="Right"
+                    Margin="0,6,46,6"
+                    Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}"
+                    WindowChrome.IsHitTestVisibleInChrome="True"
+                    bhv:MinimizeButtonBehavior.IsAttached="True"
+                    >
+                <TextBlock Text="&#xFF3F;"
+                           Margin="5,2,0,0"
+                           FontFamily="{StaticResource divireGlyphs}"
+                           FontSize="24"
+                           />
+            </Button>
+        </Grid>
+
+        <!--The area of source image selection-->
+        <Border Grid.Row="1"
+                Margin="0,4,0,8"
+                Background="{StaticResource ThemeGrayBrush02Key}"
+                >
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="60"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Column="0"
+                        WindowChrome.IsHitTestVisibleInChrome="True"
+                        Margin="8,8,0,8"
+                        bhv:FileSelectButtonBehavior.IsAttached="True"
+                        bhv:FileSelectButtonBehavior.FileFilter="{Binding ImageFileFilter}"
+                        bhv:FileSelectButtonBehavior.FilePath="{Binding SourceFilePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        bhv:FileSelectButtonBehavior.Title="Select Image File"
+                        >
+                    <TextBlock Text="&#x64B0;"
+                               Margin="0,8,0,0"
+                               FontSize="33"
+                               />
+                </Button>
+
+                <TextBlock Grid.Column="1"
+                           Margin="12,0"
+                           VerticalAlignment="Center"
+                           Text="{Binding SourceFilePath}"
+                           />
+            </Grid>
+        </Border>
+
+        <!--The area of TabControl-->
+        <TabControl Grid.Row="2"
+                    Background="{StaticResource ThemeGrayBrush02Key}"
+                    BorderThickness="0"
+                    Margin="0"
+                    WindowChrome.IsHitTestVisibleInChrome="True"
+                    TabStripPlacement="Top"
+                    >
+
+            <!--Layer Composition Tab-->
+            <TabItem Header="&#x7573;">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="60"/>
+                        <RowDefinition Height="100"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="58"/>
+                        <RowDefinition Height="60"/>
+                        <RowDefinition Height="128"/>
+                    </Grid.RowDefinitions>
+
+                    <!--Periphery-->
+                    <Border Grid.Row="0"
+                            Background="{StaticResource ThemeGrayBrush03Key}"
+                            Margin="8,8,8,0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="100"/>
+                            </Grid.ColumnDefinitions>
+
+                            <CheckBox VerticalAlignment="Center"
+                                      Margin="12,0,0,0"
+                                      Content="Periphery"
+                                      IsChecked="{Binding HasLayerOfPeriphery, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      />
+
+                            <ctrl:ColorSelector Grid.Column="1"
+                                                VerticalAlignment="Center"
+                                                HorizontalAlignment="Center"
+                                                ColorValue="{Binding ColorValueOfPeriphery, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                IsEnabled="{Binding HasLayerOfPeriphery}"
+                                                />
+                        </Grid>
+                    </Border>
+
+                    <!--Regions-->
+                    <Border Grid.Row="1"
+                            Grid.RowSpan="3"
+                            Background="{StaticResource ThemeGrayBrush03Key}"
+                            Margin="8,8,8,0"
+                            >
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="100"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="44"/>
+                                <RowDefinition Height="48"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="58"/>
+                            </Grid.RowDefinitions>
+
+                            <CheckBox VerticalAlignment="Top"
+                                      Margin="12,16,0,0"
+                                      Content="Regions"
+                                      IsChecked="{Binding HasLayersOfRegions, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      />
+
+                            <TextBlock Grid.Row="1"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Right"
+                                       Margin="0,0,78,0"
+                                       Style="{StaticResource TextBlockStyleInRegionsLayersArea}"
+                                       Text="Region"
+                                       />
+
+                            <TextBlock Grid.Row="1"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Right"
+                                       Margin="0,0,36,0"
+                                       Style="{StaticResource TextBlockStyleInRegionsLayersArea}"
+                                       Text="01"
+                                       />
+
+                            <ctrl:ColorSelector Grid.Row="1"
+                                                Grid.Column="1"
+                                                VerticalAlignment="Center"
+                                                HorizontalAlignment="Center"
+                                                ColorValue="{Binding ColorValueOfRegionFirst, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                ColorSelectedCommand="{Binding CommandUpdateMiddleColors}"
+                                                IsEnabled="{Binding HasLayersOfRegions}"
+                                                />
+
+                            <TextBlock Grid.Row="2"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Right"
+                                       Margin="0,0,38,0"
+                                       Style="{StaticResource TextBlockStyleInRegionsLayersArea}"
+                                       FontSize="55"
+                                       Text="&#xFF5E;"
+                                       />
+
+                            <ctrl:DisplayDataGrid Grid.Row="2"
+                                                  Grid.Column="1"
+                                                  Margin="15,6,0,0"
+                                                  AutoGenerateColumns="False"
+                                                  HeadersVisibility="None"
+                                                  IsHitTestVisible="False"
+                                                  Focusable="False"
+                                                  BorderThickness="0"
+                                                  VerticalScrollBarVisibility="Disabled"
+                                                  HorizontalScrollBarVisibility="Disabled"
+                                                  GridLinesVisibility="None"
+                                                  Padding="0"
+                                                  Background="Transparent"
+                                                  RowBackground="Transparent"
+                                                  PrimitiveSource="{Binding MiddleColors}"
+                                                  >
+                                <ctrl:DisplayDataGrid.Style>
+                                    <Style TargetType="ctrl:DisplayDataGrid">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding HasLayersOfRegions}" Value="False">
+                                                <Setter Property="Opacity" Value="0"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ctrl:DisplayDataGrid.Style>
+
+                                <DataGrid.Columns>
+                                    <DataGridTemplateColumn>
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Height="{Binding Path=CellElementsHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ctrl:DisplayDataGrid}}"
+                                                            Width="70"
+                                                            Orientation="Horizontal"
+                                                            >
+                                                    <Rectangle Fill="{Binding Path=Item1, Converter={StaticResource colorNameConverter}}"
+                                                               Style="{StaticResource RectangleStyleInColorIndicator}"
+                                                               />
+                                                    <Rectangle Fill="{Binding Path=Item2, Converter={StaticResource colorNameConverter}}"
+                                                               Style="{StaticResource RectangleStyleInColorIndicator}"
+                                                               />
+                                                    <Rectangle Fill="{Binding Path=Item3, Converter={StaticResource colorNameConverter}}"
+                                                               Style="{StaticResource RectangleStyleInColorIndicator}"
+                                                               />
+                                                    <Rectangle Fill="{Binding Path=Item4, Converter={StaticResource colorNameConverter}}"
+                                                               Style="{StaticResource RectangleStyleInColorIndicator}"
+                                                               />
+                                                    <Rectangle Fill="{Binding Path=Item5, Converter={StaticResource colorNameConverter}}"
+                                                               Style="{StaticResource RectangleStyleInColorIndicator}"
+                                                               />
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </ctrl:DisplayDataGrid>
+
+                            <TextBlock Grid.Row="3"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Right"
+                                       Margin="0,0,78,0"
+                                       Style="{StaticResource TextBlockStyleInRegionsLayersArea}"
+                                       Text="Region"
+                                       />
+
+                            <ctrl:NumericUpDown Grid.Row="3"
+                                                Grid.Column="0"
+                                                VerticalAlignment="Center"
+                                                HorizontalAlignment="Right"
+                                                Margin="0,-2,14,0"
+                                                Width="50"
+                                                Height="22"
+                                                TextBlock.FontFamily="{StaticResource divireGlyphs}"
+                                                TextBlock.FontSize="18"
+                                                Value="{Binding CountOfRegionLayers, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                Max="{Binding MaxOfRegionLayers}"
+                                                Min="{Binding MinOfRegionLayers}"
+                                                IsEnabled="{Binding HasLayersOfRegions}"
+                                                />
+
+                            <Border Grid.Row="3"
+                                    Grid.Column="0"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Right"
+                                    Margin="0,-2,14,0"
+                                    Width="50"
+                                    Height="22">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding HasLayersOfRegions}" Value="False">
+                                                <Setter Property="Background" Value="{StaticResource ThemeGrayBrush03Key}"/>
+                                                <Setter Property="Opacity" Value="0.84"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                            </Border>
+
+                            <ctrl:ColorSelector Grid.Row="3"
+                                                Grid.Column="1"
+                                                VerticalAlignment="Center"
+                                                HorizontalAlignment="Center"
+                                                ColorValue="{Binding ColorValueOfRegionLast, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                ColorSelectedCommand="{Binding CommandUpdateMiddleColors}"
+                                                IsEnabled="{Binding HasLayersOfRegions}"
+                                                />
+                        </Grid>
+                    </Border>
+
+                    <!--Miscellaneous-->
+                    <Border Grid.Row="4"
+                            Background="{StaticResource ThemeGrayBrush03Key}"
+                            Margin="8,8,8,0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="100"/>
+                            </Grid.ColumnDefinitions>
+
+                            <CheckBox VerticalAlignment="Center"
+                                      Margin="12,0,0,0"
+                                      Content="Misc."
+                                      IsChecked="{Binding HasLayerOfMiscellaneous, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      />
+
+                            <ctrl:ColorSelector Grid.Column="1"
+                                                VerticalAlignment="Center"
+                                                HorizontalAlignment="Center"
+                                                ColorValue="{Binding ColorValueOfMiscellaneous, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                IsEnabled="{Binding HasLayerOfMiscellaneous}"
+                                                />
+                        </Grid>
+                    </Border>
+
+                    <!--Background-->
+                    <Border Grid.Row="5"
+                            Background="{StaticResource ThemeGrayBrush03Key}"
+                            Margin="8,8,8,8">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition Height="4"/>
+                            </Grid.RowDefinitions>
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="148"/>
+                            </Grid.ColumnDefinitions>
+
+                            <CheckBox VerticalAlignment="Top"
+                                      Grid.ColumnSpan="2"
+                                      Grid.RowSpan="2"
+                                      Margin="12,16,0,0"
+                                      Content="Background"
+                                      IsChecked="{Binding HasLayerOfBackground, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      />
+                            <RadioButton Grid.Row="1"
+                                         Grid.Column="1"
+                                         VerticalAlignment="Center"
+                                         Content="Source Image"
+                                         IsChecked="{Binding BackgroundStyle, Mode=TwoWay, Converter={StaticResource radioButtonConverter}, ConverterParameter={x:Static prtc:OperationProtocol+BackgroundStyle.SourceImage}}"
+                                         IsEnabled="{Binding HasLayerOfBackground}"
+                                         />
+                            <RadioButton Grid.Row="2"
+                                         Grid.Column="1"
+                                         VerticalAlignment="Center"
+                                         Content="Blank"
+                                         IsChecked="{Binding BackgroundStyle, Mode=TwoWay, Converter={StaticResource radioButtonConverter}, ConverterParameter={x:Static prtc:OperationProtocol+BackgroundStyle.Blank}}"
+                                         IsEnabled="{Binding HasLayerOfBackground}"
+                                         />
+                        </Grid>
+                    </Border>
+                </Grid>
+            </TabItem>
+
+            <!--Image Processing Settings Tab-->
+            <TabItem Header="&#x6BEB;">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="58"/>
+                        <RowDefinition Height="128"/>
+                        <RowDefinition Height="180"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!--Dummy TextBox for Keyboad Focus adjustment-->
+                    <TextBox Opacity="0"/>
+
+                    <!--Threshold setting-->
+                    <Border Grid.Row="0"
+                            Background="{StaticResource ThemeGrayBrush03Key}"
+                            Margin="8,8,8,0"
+                            >
+                        <Grid>
+                            <TextBlock VerticalAlignment="Top"
+                                       Margin="12,16,8,0"
+                                       Grid.Column="0"
+                                       Grid.ColumnSpan="3"
+                                       Style="{StaticResource TextBlockNormalStyle}"
+                                       Text="Threshold :"
+                                       />
+                            <ctrl:NumericUpDown VerticalAlignment="Top"
+                                                HorizontalAlignment="Left"
+                                                Margin="108,14,16,0"
+                                                Width="54"
+                                                Height="22"
+                                                Focusable="False"
+                                                TextBlock.FontFamily="{StaticResource divireGlyphs}"
+                                                TextBlock.FontSize="18"
+                                                Value="{Binding ThresholdOfLines, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                Max="255"
+                                                Min="0"
+                                                />
+                            <Grid Margin="270,8,10,8"
+                                  Background="White"
+                                  >
+                                <Border Height="4"
+                                        Margin="4,0"
+                                        Background="{Binding ThresholdSampleColor, Converter={StaticResource colorNameConverter}}"
+                                        />
+                            </Grid>
+                        </Grid>
+                    </Border>
+
+                    <!--Settings of "Periphery"-->
+                    <Border Grid.Row="1"
+                            Background="{StaticResource ThemeGrayBrush03Key}"
+                            Margin="8,8,8,0"
+                            >
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="36"/>
+                            </Grid.RowDefinitions>
+                            
+                            <TextBlock VerticalAlignment="Top"
+                                       Margin="12,16,8,0"
+                                       Style="{StaticResource TextBlockNormalStyle}"
+                                       Text="Reference Point of Periphery  :"
+                                       />
+
+                            <Grid Background="White"
+                                  Margin="270,12,10,12">
+                                <RadioButton VerticalAlignment="Top"
+                                             HorizontalAlignment="Left"
+                                             Margin="2,2,0,0"
+                                             IsChecked="{Binding ReferenceCorner, Mode=TwoWay, Converter={StaticResource radioButtonConverter}, ConverterParameter={x:Static prtc:OperationProtocol+CornerPoint.TopLeft}, UpdateSourceTrigger=PropertyChanged}"
+                                             />
+                                <RadioButton VerticalAlignment="Top"
+                                             HorizontalAlignment="Right"
+                                             Margin="0,2,-10,0"
+                                             IsChecked="{Binding ReferenceCorner, Mode=TwoWay, Converter={StaticResource radioButtonConverter}, ConverterParameter={x:Static prtc:OperationProtocol+CornerPoint.TopRight}, UpdateSourceTrigger=PropertyChanged}"
+                                             />
+                                <RadioButton VerticalAlignment="Bottom"
+                                             HorizontalAlignment="Left"
+                                             Margin="0,0,2,2"
+                                             IsChecked="{Binding ReferenceCorner, Mode=TwoWay, Converter={StaticResource radioButtonConverter}, ConverterParameter={x:Static prtc:OperationProtocol+CornerPoint.BottomLeft}, UpdateSourceTrigger=PropertyChanged}"
+                                             />
+                                <RadioButton VerticalAlignment="Bottom"
+                                             HorizontalAlignment="Right"
+                                             IsChecked="{Binding ReferenceCorner, Mode=TwoWay, Converter={StaticResource radioButtonConverter}, ConverterParameter={x:Static prtc:OperationProtocol+CornerPoint.BottomRight}, UpdateSourceTrigger=PropertyChanged}"
+                                             Margin="0,0,-10,2"
+                                             />
+                            </Grid>
+                            
+                            <CheckBox Grid.Row="1"
+                                      VerticalAlignment="Bottom"
+                                      Margin="12,4,0,12"
+                                      Content="Exclude Periphery from Regions"
+                                      BorderBrush="{StaticResource ThemeGlyphRegularBrushKey}"
+                                      IsChecked="{Binding ExcludesPeriphery}"
+                                      >
+                            </CheckBox>
+                        </Grid>
+                    </Border>
+
+                    <!--Auto Renaming-->
+                    <Border Grid.Row="2"
+                            Background="{StaticResource ThemeGrayBrush03Key}"
+                            Margin="8,8,8,0"
+                            >
+                        <Grid>
+                            <CheckBox VerticalAlignment="Top"
+                                      Margin="12,16,0,0"
+                                      Content="Lay Color Over the Lines"
+                                      BorderBrush="{StaticResource ThemeGlyphRegularBrushKey}"
+                                      IsChecked="{Binding LaysColorOverLines}"
+                                      >
+                            </CheckBox>
+
+                            <Grid Background="{StaticResource ThemeGrayBrush00Key}"
+                                  Margin="12,50,12,12">
+                            </Grid>
+                            
+                            <TextBlock VerticalAlignment="Top"
+                                       Margin="22,64,8,0"
+                                       Grid.Column="0"
+                                       Grid.ColumnSpan="3"
+                                       Style="{StaticResource TextBlockNormalStyle}"
+                                       Text="Maximum Thickness of the Lines :"
+                                       />
+                            <ctrl:NumericUpDown VerticalAlignment="Top"
+                                                HorizontalAlignment="Left"
+                                                Margin="22,94,16,0"
+                                                Width="60"
+                                                Height="22"
+                                                Focusable="False"
+                                                TextBlock.FontFamily="{StaticResource divireGlyphs}"
+                                                TextBlock.FontSize="18"
+                                                Max="99"
+                                                Min="0"
+                                                Value="{Binding MaxThicknessOfLines, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                />
+
+                            <CheckBox Grid.Row="1"
+                                      VerticalAlignment="Bottom"
+                                      Margin="22,0,0,20"
+                                      Content="Enable Opening"
+                                      BorderBrush="{StaticResource ThemeGlyphRegularBrushKey}"
+                                      IsChecked="{Binding IsOpeningEnabled}"
+                                      >
+                            </CheckBox>
+
+                            <Border Margin="12,50,12,12"
+                                    >
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding LaysColorOverLines}" Value="True">
+                                                <Setter Property="Background" Value="Transparent"/>
+                                                <Setter Property="Opacity" Value="0"/>
+                                                <Setter Property="IsHitTestVisible" Value="False"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding LaysColorOverLines}" Value="False">
+                                                <Setter Property="Background" Value="{StaticResource ThemeGrayBrush03Key}"/>
+                                                <Setter Property="Opacity" Value="0.84"/>
+                                                <Setter Property="IsHitTestVisible" Value="True"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                            </Border>
+
+                        </Grid>
+                    </Border>
+
+                </Grid>
+
+            </TabItem>
+
+            <!--General Settings Tab-->
+            <TabItem Header="&#x9436;">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="100"/>
+                        <RowDefinition Height="192"/>
+                        <RowDefinition Height="60"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!--Dummy TextBox for Keyboad Focus adjustment-->
+                    <TextBox Opacity="0"/>
+
+                    <!--Suffix setting-->
+                    <Border Grid.Row="0"
+                            Background="{StaticResource ThemeGrayBrush03Key}"
+                            Margin="8,8,8,0"
+                            >
+                        <Grid>
+                            <TextBlock VerticalAlignment="Top"
+                                       Margin="12,16,8,0"
+                                       Grid.Column="0"
+                                       Grid.ColumnSpan="3"
+                                       Style="{StaticResource TextBlockNormalStyle}"
+                                       Text="Suffix of Export Files :"
+                                       />
+
+                            <Grid VerticalAlignment="Top"
+                                  HorizontalAlignment="Stretch"
+                                  Margin="12,46,12,0"
+                                  Height="28"
+                                  Background="{StaticResource ThemeGlyphRegularBrushKey}"
+                                  />
+
+                            <TextBox VerticalAlignment="Top"
+                                     HorizontalAlignment="Stretch"
+                                     Margin="12,50,12,0"
+                                     Height="26"
+                                     BorderThickness="0"
+                                     Background="Transparent"
+                                     InputMethod.IsInputMethodEnabled="False"
+                                     TextBlock.FontFamily="{StaticResource divireGlyphs}"
+                                     TextBlock.FontSize="18"
+                                     Text="{Binding Suffix, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                     bhv:RestrictedTextBoxBehavior.IsAttached="True"
+                                     bhv:RestrictedTextBoxBehavior.PermittedExpression="{Binding PermittedPathExpression}"
+                                     />
+                        </Grid>
+                    </Border>
+
+                    <!--Destination of Export Files-->
+                    <Border Grid.Row="1"
+                            Background="{StaticResource ThemeGrayBrush03Key}"
+                            Margin="8,8,8,0"
+                            >
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="40"/>
+                                <RowDefinition Height="36"/>
+                                <RowDefinition Height="36"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            
+                            <TextBlock VerticalAlignment="Top"
+                                       Margin="12,16,8,0"
+                                       Style="{StaticResource TextBlockNormalStyle}"
+                                       Text="Destination of Export Files :"
+                                       />
+
+                            <RadioButton Grid.Row="1"
+                                         Margin="12,0"
+                                         VerticalAlignment="Center"
+                                         Content="In the same folder as the source file."
+                                         IsChecked="{Binding ExportDestination, Mode=TwoWay, Converter={StaticResource radioButtonConverter}, ConverterParameter={x:Static prtc:OperationProtocol+ExportDestination.SameAsSource}, UpdateSourceTrigger=PropertyChanged}"
+                                         />
+
+                            <RadioButton Grid.Row="2"
+                                         Margin="12,0"
+                                         VerticalAlignment="Center"
+                                         Content="In the specified folder :"
+                                         IsChecked="{Binding ExportDestination, Mode=TwoWay, Converter={StaticResource radioButtonConverter}, ConverterParameter={x:Static prtc:OperationProtocol+ExportDestination.Specified}, UpdateSourceTrigger=PropertyChanged}"
+                                         />
+
+                            <Border Grid.Row="3"
+                                    Background="{StaticResource ThemeGrayBrush00Key}"
+                                    Margin="8,4,8,12"
+                                    >
+                                <Grid>
+                                    <TextBlock Margin="12,0"
+                                               VerticalAlignment="Center"
+                                               Text="{Binding SpecifiedDestination}"
+                                               />
+                                    <Button HorizontalAlignment="Right"
+                                            TextBlock.FontFamily="{StaticResource divireGlyphs}"
+                                            TextBlock.FontSize="16"
+                                            Margin="0,8,8,8"
+                                            Width="78"
+                                            Content="Browse..."
+                                            bhv:DestinationSelectButtonBehavior.IsAttached="True"
+                                            bhv:DestinationSelectButtonBehavior.Destination="{Binding SpecifiedDestination, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                            bhv:DestinationSelectButtonBehavior.DemoFileName="[Source File Name][Suffix].[extension]"
+                                            bhv:DestinationSelectButtonBehavior.Filter="Export Files |*.*"
+                                            />
+                                </Grid>
+                            </Border>
+
+                            <Border Grid.Row="3"
+                                    Grid.Column="0"
+                                    Margin="8,4,8,12"
+                                    >
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ExportDestination}" Value="{x:Static prtc:OperationProtocol+ExportDestination.Specified}">
+                                                <Setter Property="Background" Value="Transparent"/>
+                                                <Setter Property="Opacity" Value="0"/>
+                                                <Setter Property="IsHitTestVisible" Value="False"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding ExportDestination}" Value="{x:Static prtc:OperationProtocol+ExportDestination.SameAsSource}">
+                                                <Setter Property="Background" Value="{StaticResource ThemeGrayBrush03Key}"/>
+                                                <Setter Property="Opacity" Value="0.84"/>
+                                                <Setter Property="IsHitTestVisible" Value="True"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                            </Border>
+                            
+                        </Grid>
+                    </Border>
+
+                    <!--Auto Renaming-->
+                    <Border Grid.Row="2"
+                            Background="{StaticResource ThemeGrayBrush03Key}"
+                            Margin="8,8,8,0"
+                            >
+                        <Grid>
+                            <CheckBox VerticalAlignment="Center"
+                                      Margin="12,0,0,0"
+                                      Content="Enable Auto Renaming"
+                                      BorderBrush="{StaticResource ThemeGlyphRegularBrushKey}"
+                                      IsChecked="{Binding IsAutoRenameEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      >
+                            </CheckBox>
+                        </Grid>
+                    </Border>
+
+                </Grid>
+            </TabItem>
+
+            <!--Optional Settings Tab-->
+            <TabItem Header="&#xFF0B;">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="176"/>
+                        <RowDefinition Height="176"/>
+                        <RowDefinition Height="164"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!--Calculation of Padding Colors-->
+                    <Border Grid.Row="0"
+                            Background="{StaticResource ThemeGrayBrush03Key}"
+                            Margin="8,8,8,0"
+                            >
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="40"/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition Height="8"/>
+                            </Grid.RowDefinitions>
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="12"/>
+                                <ColumnDefinition Width="218"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock VerticalAlignment="Top"
+                                       Margin="12,16,8,0"
+                                       Grid.Column="0"
+                                       Grid.ColumnSpan="3"
+                                       Style="{StaticResource TextBlockNormalStyle}"
+                                       Text="Calculation of Padding Colors :"
+                                       />
+
+                            <Grid Grid.Row="1"
+                                  Grid.Column="2"
+                                  HorizontalAlignment="Stretch"
+                                  Margin="0,4,10,4"
+                                  >
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="4"/>
+                                    <ColumnDefinition Width="2"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="2"/>
+                                    <ColumnDefinition Width="4"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Border Grid.Column="0"
+                                        Background="#AFD787"
+                                        />
+                                <Border Grid.Column="2">
+                                    <Border.Background>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                            <GradientStop Color="#AFD787" Offset="0" />
+                                            <GradientStop Color="#87FF87" Offset="0.2" />
+                                            <GradientStop Color="#8787FF" Offset="0.8" />
+                                            <GradientStop Color="#AF87D7" Offset="1" />
+                                        </LinearGradientBrush>
+                                    </Border.Background>
+                                </Border>
+                                <Border Grid.Column="4"
+                                        Background="#AF87D7"
+                                        />
+                            </Grid>
+
+                            <RadioButton Grid.Row="1"
+                                         Grid.Column="1"
+                                         Grid.ColumnSpan="2"
+                                         VerticalAlignment="Center"
+                                         Content="Hue Transition"
+                                         IsChecked="{Binding ColorCalculation, Mode=TwoWay, Converter={StaticResource radioButtonConverter}, ConverterParameter={x:Static prtc:OperationProtocol+ColorCalculation.Hue}}"
+                                         />
+
+                            <Grid Grid.Row="2"
+                                  Grid.Column="2"
+                                  HorizontalAlignment="Stretch"
+                                  Margin="0,4,10,4"
+                                  >
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="4"/>
+                                    <ColumnDefinition Width="2"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="2"/>
+                                    <ColumnDefinition Width="4"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Border Grid.Column="0"
+                                        Background="#AFD787"
+                                        />
+                                <Border Grid.Column="2">
+                                    <Border.Background>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                            <GradientStop Color="#AFD787" Offset="0" />
+                                            <GradientStop Color="#FF8787" Offset="0.5" />
+                                            <GradientStop Color="#AF87D7" Offset="1" />
+                                        </LinearGradientBrush>
+                                    </Border.Background>
+                                </Border>
+                                <Border Grid.Column="4"
+                                        Background="#AF87D7"
+                                        />
+                            </Grid>
+
+                            <RadioButton Grid.Row="2"
+                                         Grid.Column="1"
+                                         Grid.ColumnSpan="2"
+                                         VerticalAlignment="Center"
+                                         Content="Hue Transition via Red"
+                                         IsChecked="{Binding ColorCalculation, Mode=TwoWay, Converter={StaticResource radioButtonConverter}, ConverterParameter={x:Static prtc:OperationProtocol+ColorCalculation.HueViaRed}}"
+                                         />
+
+                            <Grid Grid.Row="3"
+                                  Grid.Column="2"
+                                  HorizontalAlignment="Stretch"
+                                  Margin="0,4,10,4"
+                                  >
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="4"/>
+                                    <ColumnDefinition Width="2"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="2"/>
+                                    <ColumnDefinition Width="4"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Border Grid.Column="0"
+                                        Background="#AFD787"
+                                        />
+                                <Border Grid.Column="2">
+                                    <Border.Background>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                            <GradientStop Color="#AFD787" Offset="0" />
+                                            <GradientStop Color="#AF87D7" Offset="1" />
+                                        </LinearGradientBrush>
+                                    </Border.Background>
+                                </Border>
+                                <Border Grid.Column="4"
+                                        Background="#AF87D7"
+                                        />
+                            </Grid>
+
+                            <RadioButton Grid.Row="3"
+                                         Grid.Column="1"
+                                         Grid.ColumnSpan="2"
+                                         VerticalAlignment="Center"
+                                         Content="RGB Composition"
+                                         IsChecked="{Binding ColorCalculation, Mode=TwoWay, Converter={StaticResource radioButtonConverter}, ConverterParameter={x:Static prtc:OperationProtocol+ColorCalculation.Rgb}}"
+                                         />
+                        </Grid>
+                    </Border>
+
+                    <!--Order of Regions-->
+                    <Border Grid.Row="1"
+                            Background="{StaticResource ThemeGrayBrush03Key}"
+                            Margin="8,8,8,0"
+                            >
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="40"/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition Height="8"/>
+                            </Grid.RowDefinitions>
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="12"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock VerticalAlignment="Top"
+                                       Margin="12,16,8,0"
+                                       Grid.Column="0"
+                                       Grid.ColumnSpan="3"
+                                       Style="{StaticResource TextBlockNormalStyle}"
+                                       Text="Order of Regions :"
+                                       />
+
+                            <RadioButton Grid.Row="1"
+                                         Grid.Column="1"
+                                         VerticalAlignment="Center"
+                                         Content="Descending Order of Area"
+                                         IsChecked="{Binding OrderOfRegions, Mode=TwoWay, Converter={StaticResource radioButtonConverter}, ConverterParameter={x:Static prtc:OperationProtocol+OrderOfRegions.AreaDescending}}"
+                                         />
+
+                            <RadioButton Grid.Row="2"
+                                         Grid.Column="1"
+                                         VerticalAlignment="Center"
+                                         Content="Ascending Order of Area"
+                                         IsChecked="{Binding OrderOfRegions, Mode=TwoWay, Converter={StaticResource radioButtonConverter}, ConverterParameter={x:Static prtc:OperationProtocol+OrderOfRegions.AreaAscending}}"
+                                         />
+
+                            <RadioButton Grid.Row="3"
+                                         Grid.Column="1"
+                                         VerticalAlignment="Center"
+                                         Content="From Upper Left To Lower Right"
+                                         IsChecked="{Binding OrderOfRegions, Mode=TwoWay, Converter={StaticResource radioButtonConverter}, ConverterParameter={x:Static prtc:OperationProtocol+OrderOfRegions.FromUpperLeftToLowerRight}}"
+                                         />
+                        </Grid>
+                    </Border>
+
+                    <!--Layer Options-->
+                    <Border Grid.Row="2"
+                            Background="{StaticResource ThemeGrayBrush03Key}"
+                            Margin="8,8,8,0"
+                            >
+                        <Grid>
+                            <TextBlock VerticalAlignment="Top"
+                                       Margin="12,16,0,0"
+                                       Style="{StaticResource TextBlockNormalStyle}"
+                                       Text="Layer Options  ( for  &quot;.psd&quot; )"
+                                       />
+                            <Grid Background="{StaticResource ThemeGrayBrush00Key}"
+                                  Margin="12,46,12,14">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <TextBlock Grid.Row="0"
+                                           VerticalAlignment="Top"
+                                           Margin="12,16,0,0"
+                                           Style="{StaticResource TextBlockNormalStyle}"
+                                           Text="Opacity :"
+                                           />
+                                <ctrl:NumericUpDown Grid.Column="1"
+                                                    VerticalAlignment="Top"
+                                                    HorizontalAlignment="Left"
+                                                    Margin="0,14,0,0"
+                                                    Width="56"
+                                                    Height="22"
+                                                    Focusable="False"
+                                                    TextBlock.FontFamily="{StaticResource divireGlyphs}"
+                                                    TextBlock.FontSize="18"
+                                                    Value="{Binding OpacityOfLayers, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                    Max="255"
+                                                    Min="0"
+                                                    />
+                                <TextBlock Grid.Row="1"
+                                           VerticalAlignment="Top"
+                                           Margin="12,12,0,0"
+                                           Style="{StaticResource TextBlockNormalStyle}"
+                                           Text="Blend Mode :"
+                                           />
+                                <ComboBox Grid.Row="1"
+                                          Grid.Column="1"
+                                          VerticalAlignment="Top"
+                                          HorizontalAlignment="Left"
+                                          Margin="0,4,0,0"
+                                          Style="{StaticResource ThemeComboBoxStyle}"
+                                          Height="32"
+                                          Width="152"
+                                          SelectedValue="{Binding BlendMode, Converter={StaticResource blendModeConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                          SelectedValuePath="Content"
+                                          >
+                                    <ComboBoxItem Content="Normal"/>
+                                    <ComboBoxItem Content="Dissolve"/>
+                                    <Separator/>
+                                    <ComboBoxItem Content="Darken"/>
+                                    <ComboBoxItem Content="Multiply"/>
+                                    <ComboBoxItem Content="Color Burn"/>
+                                    <ComboBoxItem Content="Linear Burn"/>
+                                    <ComboBoxItem Content="Darker Color"/>
+                                    <Separator/>
+                                    <ComboBoxItem Content="Lighten"/>
+                                    <ComboBoxItem Content="Screen"/>
+                                    <ComboBoxItem Content="Color Dodge"/>
+                                    <ComboBoxItem Content="Linear Dodge"/>
+                                    <ComboBoxItem Content="Lighter Color"/>
+                                    <Separator/>
+                                    <ComboBoxItem Content="Overlay"/>
+                                    <ComboBoxItem Content="Soft Light"/>
+                                    <ComboBoxItem Content="Hard Light"/>
+                                    <ComboBoxItem Content="Vivid Light"/>
+                                    <ComboBoxItem Content="Linear Light"/>
+                                    <ComboBoxItem Content="Pin Light"/>
+                                    <ComboBoxItem Content="Hard Mix"/>
+                                    <Separator/>
+                                    <ComboBoxItem Content="Difference"/>
+                                    <ComboBoxItem Content="Exclusion"/>
+                                    <ComboBoxItem Content="Subtract"/>
+                                    <ComboBoxItem Content="Divide"/>
+                                    <Separator/>
+                                    <ComboBoxItem Content="Hue"/>
+                                    <ComboBoxItem Content="Saturation"/>
+                                    <ComboBoxItem Content="Color"/>
+                                    <ComboBoxItem Content="Luminosity"/>
+                                </ComboBox>
+                            </Grid>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+        <!--The area of image export-->
+        <Border Grid.Row="3"
+                Background="{StaticResource ThemeGrayBrush02Key}"
+                Margin="0,8,0,0"
+                >
+            <Grid Margin="8">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="60"/>
+                </Grid.RowDefinitions>
+
+                <!--Image format selection-->
+                <Grid Grid.Row="0" Margin="0,2,0,6">
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="152"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock VerticalAlignment="Center"
+                               Style="{StaticResource TextBlockNormalStyle}"
+                               Margin="12,0"
+                               Text="Export as"
+                               />
+
+                    <RadioButton Grid.Row="0"
+                                 Grid.Column="1"
+                                 VerticalAlignment="Center"
+                                 Content=".jpg"
+                                 IsChecked="{Binding ExportStyle, Mode=TwoWay, Converter={StaticResource radioButtonConverter}, ConverterParameter={x:Static prtc:OperationProtocol+ExportStyle.Jpg}}"
+                                 />
+                    <RadioButton Grid.Row="1"
+                                 Grid.Column="1"
+                                 VerticalAlignment="Center"
+                                 Content=".png"
+                                 IsChecked="{Binding ExportStyle, Mode=TwoWay, Converter={StaticResource radioButtonConverter}, ConverterParameter={x:Static prtc:OperationProtocol+ExportStyle.Png}}"
+                                 />
+                    <RadioButton Grid.Row="2"
+                                 Grid.Column="1"
+                                 VerticalAlignment="Center"
+                                 Content=".psd"
+                                 IsChecked="{Binding ExportStyle, Mode=TwoWay, Converter={StaticResource radioButtonConverter}, ConverterParameter={x:Static prtc:OperationProtocol+ExportStyle.Psd}}"
+                                 />
+                </Grid>
+
+                <!--Export execution-->
+                <Border Grid.Row="1"
+                        Margin="4,2"
+                        Background="{StaticResource ThemeGrayBrush00Key}"
+                        >
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="60"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Column="0"
+                                   Margin="12,0"
+                                   VerticalAlignment="Center"
+                                   Text="{Binding ExportFileName}"
+                                   />
+
+                        <Button Grid.Column="1"
+                                WindowChrome.IsHitTestVisibleInChrome="True"
+                                Margin="0,6,8,6"
+                                IsEnabled="{Binding CanExport, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                Command="{Binding CommandExport}"
+                                >
+                            <TextBlock Text="&#x637B;"
+                                       Margin="2,6,0,0"
+                                       FontSize="33"
+                                       />
+                        </Button>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!--Cover object (when the application is busy)-->
+        <Grid Grid.RowSpan="4"
+              Background="{StaticResource ThemeGrayBrush00Key}"
+              >
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsBusy}" Value="False">
+                            <Setter Property="Opacity" Value="0"/>
+                            <Setter Property="IsHitTestVisible" Value="False"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding IsBusy}" Value="True">
+                            <Setter Property="Opacity" Value="0.64"/>
+                            <Setter Property="IsHitTestVisible" Value="True"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+        </Grid>
+
+        <!--Waiting indicator-->
+        <Grid Grid.RowSpan="4"
+              IsHitTestVisible="False"
+              >
+            <TextBlock Text="&#xFF10;"
+                       Style="{StaticResource TextBlockIndicatorStyle00}"
+                       />
+            <TextBlock Text="&#xFF11;"
+                       Style="{StaticResource TextBlockIndicatorStyle01}"
+                       />
+            <TextBlock Text="&#xFF12;"
+                       Style="{StaticResource TextBlockIndicatorStyle02}"
+                       />
+            <TextBlock Text="&#xFF13;"
+                       Style="{StaticResource TextBlockIndicatorStyle03}"
+                       />
+            <TextBlock Text="&#xFF14;"
+                       Style="{StaticResource TextBlockIndicatorStyle04}"
+                       />
+            <TextBlock Text="&#xFF15;"
+                       Style="{StaticResource TextBlockIndicatorStyle05}"
+                       />
+            <TextBlock Text="&#xFF16;"
+                       Style="{StaticResource TextBlockIndicatorStyle06}"
+                       />
+            <TextBlock Text="&#xFF17;"
+                       Style="{StaticResource TextBlockIndicatorStyle07}"
+                       />
+            <TextBlock Text="&#xFF18;"
+                       Style="{StaticResource TextBlockIndicatorStyle08}"
+                       />
+            <TextBlock Text="&#xFF19;"
+                       Style="{StaticResource TextBlockIndicatorStyle09}"
+                       />
+            <TextBlock Text="&#xFF1A;"
+                       Style="{StaticResource TextBlockIndicatorStyle10}"
+                       />
+            <TextBlock Text="&#xFF1B;"
+                       Style="{StaticResource TextBlockIndicatorStyle11}"
+                       />
+        </Grid>
+
+    </Grid>
+</Window>
