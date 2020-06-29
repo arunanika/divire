@@ -34,13 +34,13 @@ divire is a utility that automatically paints line art image files and converts 
    
    
    
-5. In the root folder of the divire project, create the following folder : \packages\opencv\install
+5. In the root folder of the divire repository, create the following folder : \packages\opencv\install
 
 
 6. Copy the "include" and "x64" folders in the "install" folder created in **step 4** to the "install" folder created in **step 5**.
 
 
-7. Build "ColoringTrial.sln" in the divire project.
+7. Build "ColoringTrial.sln" in the divire repository.
 
 
 # Documentation
