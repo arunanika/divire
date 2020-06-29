@@ -22,7 +22,7 @@ divire is a utility that automatically paints line art image files and converts 
 
 
 
-3. Create that OpenCV solution for "Visual Studio 15 2017 Win64" with [CMake](https://cmake.org/).
+3. Create the OpenCV solution for "Visual Studio 15 2017 Win64" with [CMake](https://cmake.org/).
 
    Use the following option : -D BUILD_SHARED_LIBS=OFF
    
