@@ -9,6 +9,11 @@ divire is a utility that automatically paints line art image files and converts 
   <img src="https://user-images.githubusercontent.com/63274471/85966176-efd60f80-b9f9-11ea-941b-f8e83a546ce4.jpg" alt="divire_demo">
 </h1>
 
+
+# Download
+
+The latest version of divire is available [here](https://github.com/arunanika/divire/releases).
+
 # Requirements
 
 - .NET Framework 4.8
