@@ -23,7 +23,7 @@ The latest version of divire is available [here](https://github.com/arunanika/di
 
 
 
-2. Download and install OpenCV (Use a 4.0.0 version) at http://opencv.org/releases.html.
+2. Download OpenCV (Use a 4.3.0 version) sources at http://opencv.org/releases.html.
 
 
 
@@ -33,7 +33,7 @@ The latest version of divire is available [here](https://github.com/arunanika/di
    
 4. Open the created OpenCV solution (OpenCV.sln) and build the "INSTALL" project (in the "CMakeTargets" Folder).
 
-   Static library and header files will be generated in the "install" folder in the same hierarchy as the OpenCV solution file.
+   Static-link libraries and header files will be generated in the "install" folder in the same hierarchy as the OpenCV solution file.
    
    
    
