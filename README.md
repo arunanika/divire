@@ -27,10 +27,8 @@ The latest version of divire is available [here](https://github.com/arunanika/di
 
 
 
-3. Create the OpenCV solution for "Visual Studio 15 2017 Win64" with [CMake](https://cmake.org/).
-
-   Use the following option : -D BUILD_SHARED_LIBS=OFF
-   
+3. Create an OpenCV solution for "Visual Studio 15 2017 Win64" using [CMake](https://cmake.org/) with the value of the "BUILD_SHARED_LIBS" option set to OFF.
+  
    
    
 4. Open the created OpenCV solution (OpenCV.sln) and build the "INSTALL" project (in the "CMakeTargets" Folder).
@@ -39,13 +37,13 @@ The latest version of divire is available [here](https://github.com/arunanika/di
    
    
    
-5. In the root folder of the divire repository, create the following folder : \packages\opencv\install
+5. In the root folder of the **divire** repository, create the following folder : \packages\opencv\install
 
 
 6. Copy the "include" and "x64" folders in the "install" folder created in **step 4** to the "install" folder created in **step 5**.
 
 
-7. Build "ColoringTrial.sln" in the divire repository.
+7. Open "ColoringTrial.sln" in Visual Studio, and build with the target platform as "x64".
 
 
 # Documentation
